@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>film strip</title>
+<script>
+(function(){try{
+if(!('IntersectionObserver' in window))return;
+var io=new IntersectionObserver(function(es){
+  var v=es[0]&&es[0].isIntersecting;
+  document.documentElement.classList.toggle('mk-off',!v);
+},{threshold:0});
+io.observe(document.documentElement);
+}catch(e){}})();
+</script>
+<style>
+.mk-off *{animation-play-state:paused !important}
+html,body{height:100%;margin:0;padding:0;overflow:hidden;background:transparent}
+body{display:flex;justify-content:center;align-items:center;-webkit-tap-highlight-color:transparent}
+.fw{width:100vw;height:100vh;display:flex;align-items:center;overflow:hidden}
+.track{display:flex;will-change:transform;animation:roll 14s linear infinite}
+@media (hover:hover){.track:hover{animation-play-state:paused}}
+@keyframes roll{to{transform:translateX(-25%)}}
+@media (prefers-reduced-motion: reduce){
+.fw{overflow-x:auto}
+.track{animation:none}
+}
+.frame{position:relative;flex:none;height:min(72vh,330px);aspect-ratio:3/2;background:#17140f;padding:26px 12px;box-sizing:border-box;margin-right:14px;border-radius:4px;cursor:pointer}
+.frame::before,.frame::after{content:"";position:absolute;left:10px;right:10px;height:12px;background-image:radial-gradient(rgba(246,242,232,.9) 0 3.2px,transparent 3.9px);background-size:22px 12px;background-position:center;background-repeat:repeat-x}
+.frame::before{top:7px}
+.frame::after{bottom:7px}
+.ph{width:100%;height:100%;overflow:hidden;background:#000}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease;will-change:transform}
+.frame:hover .ph img{transform:scale(1.05)}
+.lb{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50;background:rgba(8,8,16,.9);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;cursor:pointer}
+.lb img{max-width:88vw;max-height:86vh;border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,.6);transform:scale(.93);transition:transform .3s ease;will-change:transform}
+.lb.on{opacity:1;pointer-events:auto}
+.lb.on img{transform:scale(1)}
+</style>
+<style>.mk-key-focus:focus-visible{outline:3px solid #ffd66b!important;outline-offset:4px!important}</style>
+</head>
+<body>
+<div class="fw"><div class="track" id="track"><div class="frame"><div class="ph"><img src="./1.webp" alt=""></div></div><div class="frame"><div class="ph"><img src="./2.webp" alt=""></div></div><div class="frame"><div class="ph"><img src="./3.webp" alt=""></div></div><div class="frame"><div class="ph"><img src="./4.webp" alt=""></div></div></div></div>
+<div class="lb" id="lb"><img id="lbImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""></div>
+<script>
+(function(){
+var track=document.getElementById('track'),lb=document.getElementById('lb'),
+  lbImg=document.getElementById('lbImg'),openedAt=0;
+var one=track.innerHTML;track.innerHTML=one+one+one+one;
+track.addEventListener('click',function(e){
+  var f=e.target.closest('.frame');
+  if(!f)return;
+  var im=f.querySelector('img');
+  if(!im)return;
+  lbImg.src=im.src;
+  lb.classList.add('on');
+  openedAt=Date.now();
+});
+lb.addEventListener('click',function(){
+  if(Date.now()-openedAt<350)return;
+  lb.classList.remove('on');
+});
+})();
+</script>
+<script>
+(function(){
+var nodes=[].slice.call(document.querySelectorAll(".frame"));
+nodes.forEach(function(el){el.tabIndex=0;el.setAttribute("role","button");el.setAttribute("aria-label","사진 크게 보기");el.classList.add("mk-key-focus");
+el.addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();el.click();});});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){var lb=document.getElementById("lb");if(lb)lb.classList.remove("on");}});
+})();
+</script>
+</body>
+</html>
